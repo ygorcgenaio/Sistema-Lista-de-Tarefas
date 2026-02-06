@@ -1,0 +1,47 @@
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Custo (R$)</th>
+            <th>Data Limite</th>
+            <th>Ações</th> </tr>
+    </thead>
+    <tbody>
+        {% for tarefa in tarefas %}
+        <tr style="{% if tarefa.custo >= 1000 %}background-color: yellow;{% endif %}">
+            <td>{{ tarefa.id }}</td>
+            <td>{{ tarefa.nome }}</td>
+            <td>R$ {{ "{:,.2f}".format(tarefa.custo).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+            <td>{{ tarefa.data_limite.strftime('%d/%m/%Y') }}</td>
+            
+            <td>
+                {% if not loop.first %}
+                    <a href="{{ url_for('subir', id=tarefa.id) }}"><button title="Subir">⬆️</button></a>
+                {% endif %}
+                
+                {% if not loop.last %}
+                    <a href="{{ url_for('descer', id=tarefa.id) }}"><button title="Descer">⬇️</button></a>
+                {% endif %}
+
+                <a href="{{ url_for('editar', id=tarefa.id) }}"><button>Editar</button></a>
+
+                <form action="{{ url_for('excluir', id=tarefa.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                        Excluir
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4"><strong>Total Acumulado:</strong></td>
+            <td><strong>R$ {{ "{:,.2f}".format(total).replace(',', 'X').replace('.', ',').replace('X', '.') }}</strong></td>
+        </tr>
+    </tfoot>
+</table>
+
+<br>
+<a href="{{ url_for('incluir') }}"><button>Incluir Nova Tarefa</button></a>
