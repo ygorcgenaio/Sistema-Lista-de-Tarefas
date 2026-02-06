@@ -91,29 +91,36 @@ def editar(id):
 
 @app.route('/subir/<int:id>')
 def subir(id):
-    """Move a tarefa para cima na lista"""
     tarefa_atual = Tarefa.query.get_or_404(id)
+    # Busca a tarefa imediatamente acima na ordem
     tarefa_cima = Tarefa.query.filter(Tarefa.ordem_apresentacao < tarefa_atual.ordem_apresentacao)\
                                .order_by(Tarefa.ordem_apresentacao.desc()).first()
     
     if tarefa_cima:
-        tarefa_atual.ordem_apresentacao, tarefa_cima.ordem_apresentacao = \
-        tarefa_cima.ordem_apresentacao, tarefa_atual.ordem_apresentacao
+        # Troca as ordens de apresentação entre as duas
+        ordem_aux = tarefa_atual.ordem_apresentacao
+        tarefa_atual.ordem_apresentacao = tarefa_cima.ordem_apresentacao
+        tarefa_cima.ordem_apresentacao = ordem_aux
         db.session.commit()
     
+    # O segredo: redirecionar para a função 'index' (que é a rota '/')
     return redirect(url_for('index'))
 
 @app.route('/descer/<int:id>')
 def descer(id):
-    """Move a tarefa para baixo na lista"""
     tarefa_atual = Tarefa.query.get_or_404(id)
+    # Busca a tarefa imediatamente abaixo na ordem
     tarefa_baixo = Tarefa.query.filter(Tarefa.ordem_apresentacao > tarefa_atual.ordem_apresentacao)\
                                  .order_by(Tarefa.ordem_apresentacao.asc()).first()
     
     if tarefa_baixo:
-        tarefa_atual.ordem_apresentacao, tarefa_baixo.ordem_apresentacao = \
-        tarefa_baixo.ordem_apresentacao, tarefa_atual.ordem_apresentacao
+        # Troca as ordens de apresentação entre as duas
+        ordem_aux = tarefa_atual.ordem_apresentacao
+        tarefa_atual.ordem_apresentacao = tarefa_baixo.ordem_apresentacao
+        tarefa_baixo.ordem_apresentacao = ordem_aux
         db.session.commit()
+        
+    return redirect(url_for('index'))
     
     return redirect(url_for('index'))
 
