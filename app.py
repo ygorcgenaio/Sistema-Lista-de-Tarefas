@@ -9,6 +9,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tarefas.db'
 db.init_app(app)
 
 @app.route('/incluir', methods=['GET', 'POST'])
+def index():
+    # Busca todas as tarefas ordenadas para mostrar na tabela
+    tarefas = Tarefa.query.order_by(Tarefa.ordem_apresentacao).all()
+    # Calcula o total para o rodapé da tabela
+    total = sum(t.custo for t in tarefas)
+    return render_template('index.html', tarefas=tarefas, total=total)
+
 def incluir():
     if request.method == 'POST':
         nome = request.form['nome']
