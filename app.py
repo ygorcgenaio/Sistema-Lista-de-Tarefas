@@ -29,6 +29,14 @@ def incluir():
             flash('Erro: Já existe uma tarefa com este nome.')
             return redirect(url_for('incluir'))
 
+        # Validações solicitadas: negativo e valor excessivo
+        if custo < 0:
+            flash('Erro: O custo não pode ser um valor negativo.')
+            return redirect(url_for('incluir'))
+        if custo > 99999999.99:
+            flash('Erro: O custo informado é muito alto.')
+            return redirect(url_for('incluir'))
+
         ultima_ordem = db.session.query(func.max(Tarefa.ordem_apresentacao)).scalar() or 0
         
         nova_tarefa = Tarefa(
@@ -68,6 +76,14 @@ def editar(id):
             flash('Erro: Já existe uma tarefa com este nome.')
             return redirect(url_for('editar', id=id))
 
+        # Validações na edição também!
+        if novo_custo < 0:
+            flash('Erro: O custo não pode ser negativo.')
+            return redirect(url_for('editar', id=id))
+        if novo_custo > 99999999.99:
+            flash('Erro: Valor muito alto.')
+            return redirect(url_for('editar', id=id))
+
         tarefa.nome = novo_nome
         tarefa.custo = novo_custo
         tarefa.data_limite = nova_data
@@ -83,13 +99,10 @@ def subir(id):
     if tarefa_cima:
         ordem_original_atual = tarefa_atual.ordem_apresentacao
         ordem_original_cima = tarefa_cima.ordem_apresentacao
-        
         tarefa_atual.ordem_apresentacao = 0
         db.session.commit()
-        
         tarefa_cima.ordem_apresentacao = ordem_original_atual
         db.session.commit()
-        
         tarefa_atual.ordem_apresentacao = ordem_original_cima
         db.session.commit()
     return redirect(url_for('index'))
@@ -102,13 +115,10 @@ def descer(id):
     if tarefa_baixo:
         ordem_original_atual = tarefa_atual.ordem_apresentacao
         ordem_original_baixo = tarefa_baixo.ordem_apresentacao
-        
         tarefa_atual.ordem_apresentacao = 0
         db.session.commit()
-        
         tarefa_baixo.ordem_apresentacao = ordem_original_atual
         db.session.commit()
-        
         tarefa_atual.ordem_apresentacao = ordem_original_baixo
         db.session.commit()
     return redirect(url_for('index'))
